@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import userRouter from "./Routers/userRouter.js";
+import categoryRouter from "./Routers/categoryRouter.js";
 
 import { connectToMongoDb } from "./config/dbConfig.js";
 
@@ -16,13 +18,14 @@ connectToMongoDb();
 
 // Serve Images to Client
 import path from "path";
-import userRouter from "./Routers/userRouter.js";
+
 const __dirname = path.resolve();
 
 app.use(express.static(path.join(__dirname, "/public")));
 
 // Routes
 app.use("/api/user", userRouter);
+app.use("/api/category", categoryRouter);
 
 // Run the server
 app.listen(PORT, (error) => {

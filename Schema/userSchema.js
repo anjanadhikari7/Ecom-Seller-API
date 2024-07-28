@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    Otp: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

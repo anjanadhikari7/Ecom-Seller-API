@@ -13,5 +13,10 @@ export const updateUser = (filter, updatedUser) => {
 // Find user by email
 
 export const findUserByEmail = (email) => {
+  console.log(email);
   return userSchema.findOne({ email });
+};
+
+export const findOtp = (otp) => {
+  return userSchema.findOne(otp);
 };

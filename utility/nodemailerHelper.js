@@ -77,3 +77,32 @@ export const sendAccountVerifiedEmail = (user, loginUrl) => {
 
   sendEmail(emailFormat);
 };
+
+export const sendOTP = (otp, email) => {
+  const emailFormat = {
+    from: `Eco Den<${process.env.SMTP_USER}>`,
+    to: email,
+    subject: "OTP",
+    html: `
+  </head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+  <div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+    <div style="background-color: #007bff; color: #ffffff; padding: 10px 0; text-align: center;">
+      <h1 style="margin: 0;">ECOM DEN</h1>
+    </div>
+    <div style="padding: 20px; text-align: center;">
+      <h2 style="margin-top: 0;">Your One-Time Password (OTP)</h2>
+      <p style="margin: 20px 0;">Use the following OTP to complete your request. This OTP is valid for the next 10 minutes.</p>
+      <div style="font-size: 24px; font-weight: bold; margin: 20px 0; color: #007bff;">${otp}</div>
+      <p style="margin: 20px 0;">If you did not request this, please ignore this email.</p>
+    </div>
+    <div style="background-color: #f4f4f4; padding: 10px; text-align: center; font-size: 12px; color: #666666;">
+      <p style="margin: 0;">&copy; 2024 ECOM DEN. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+    `,
+  };
+
+  sendEmail(emailFormat);
+};

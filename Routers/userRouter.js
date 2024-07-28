@@ -1,11 +1,17 @@
 import express from "express";
 import { newUserValidation } from "../middleware/validationMiddleware/userValidation.js";
 import { comparePassword, hashPassword } from "../utility/bcryptHelper.js";
-import { createUser, findUserByEmail, updateUser } from "../Model/userModel.js";
+import {
+  createUser,
+  findOtp,
+  findUserByEmail,
+  updateUser,
+} from "../Model/userModel.js";
 import { v4 as uuidv4 } from "uuid";
 import { createSession, deleteSession } from "../Model/sessionModel.js";
 import {
   sendAccountVerifiedEmail,
+  sendOTP,
   sendVerificationLinkEmail,
 } from "../utility/nodemailerHelper.js";
 import {
@@ -13,6 +19,11 @@ import {
   buildSuccessResponse,
 } from "../utility/responseHelper.js";
 import { generateJWTs } from "../utility/jwtHelper.js";
+import {
+  adminAuth,
+  refreshAuth,
+} from "../middleware/authMiddleware/authMiddleware.js";
+import generateOTP from "../utility/otpGenerateHelper.js";
 const userRouter = express.Router();
 
 // Create USER | POST |Signup
@@ -108,22 +119,21 @@ userRouter.post("/login", async (req, res) => {
     // Find user by email
 
     const user = await findUserByEmail(email);
-    console.log(user);
 
     //return error if user is not found or not verified
     if (!user?._id) {
-      return buildErrorResponse(res, "User account does not exist!");
+      buildErrorResponse(res, "User account does not exist!");
+      return;
     }
 
     if (!user?.isVerified) {
-      return buildErrorResponse(res, "User is not verified");
+      buildErrorResponse(res, "User is not verified");
+      return;
     }
 
     if (user?.role !== "admin") {
-      return buildErrorResponse(
-        res,
-        "You are not authorized to access this app"
-      );
+      buildErrorResponse(res, "You are not authorized to access this app");
+      return;
     }
     // Compare password
     const isPasswordMatched = comparePassword(password, user.password);
@@ -132,7 +142,8 @@ userRouter.post("/login", async (req, res) => {
     if (isPasswordMatched) {
       const jwt = await generateJWTs(user.email);
 
-      return buildSuccessResponse(res, jwt, "Logged in Successfully");
+      buildSuccessResponse(res, jwt, "Logged in Successfully");
+      return;
     }
 
     return buildErrorResponse(res, "Invalid Credentials");
@@ -141,4 +152,117 @@ userRouter.post("/login", async (req, res) => {
   }
 });
 
+// PRIVATE ROUTES
+
+//Get user
+userRouter.get("/", adminAuth, async (req, res) => {
+  try {
+    buildSuccessResponse(res, req.userInfo, "User Info");
+  } catch (error) {
+    buildErrorResponse(res, error.message);
+  }
+});
+
+// GET NEW ACCESS TOKEN
+userRouter.get("/accessjwt", refreshAuth);
+
+//LOGOUT USER
+userRouter.post("/logout", adminAuth, async (req, res) => {
+  try {
+    const { email } = req.body;
+    const { authorization } = req.headers;
+
+    //remove session for the user
+    await deleteSession({ token: authorization, userEmail: email });
+
+    buildSuccessResponse(res, {}, "Bye, See you again!!");
+  } catch (error) {
+    buildErrorResponse(res, error.message);
+  }
+});
+
 export default userRouter;
+
+// Send OTP
+
+userRouter.post("/verify-email", async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log(email);
+    const user = await findUserByEmail(email);
+    console.log(user);
+    if (!user?._id) {
+      return buildErrorResponse(res, "User account does not exist!");
+    }
+    {
+      const otp = generateOTP(6);
+      const session = await updateUser(
+        { email: email },
+        {
+          Otp: otp,
+        }
+      );
+      if (session?._id) {
+        sendOTP(otp, email);
+        return buildSuccessResponse(
+          res,
+          {},
+          "OTP sent successfully, Please check your email!"
+        );
+      }
+    }
+  } catch (error) {
+    buildErrorResponse(res, error.message);
+  }
+});
+userRouter.post("/verify-otp", async (req, res) => {
+  try {
+    const { otp } = req.body;
+
+    const result = await findOtp({
+      Otp: otp,
+    });
+
+    if (!result?._id) {
+      return buildErrorResponse(res, "Invalid OTP!!");
+    }
+
+    return buildSuccessResponse(
+      res,
+      result,
+      "OTP verified successfully, Please enter your new password"
+    );
+  } catch (error) {
+    buildErrorResponse(res, error.message);
+  }
+});
+
+userRouter.post("/reset-password", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await findUserByEmail(email);
+
+    if (!user?._id) {
+      return buildErrorResponse(res, " User doesnot exist!!");
+    }
+
+    const encryptedPassword = hashPassword(password);
+    const updatedUser = await updateUser(
+      { email },
+      {
+        password: encryptedPassword,
+      }
+    );
+
+    if (!updatedUser?._id) {
+      return buildErrorResponse(res, " Failed to update Password");
+    }
+
+    return buildSuccessResponse(
+      res,
+      updatedUser,
+      "Password Changed Successfully! Please login"
+    );
+  } catch (error) {}
+});
