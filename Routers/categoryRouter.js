@@ -1,5 +1,9 @@
 import express from "express";
-import { createCategory, getCategories } from "../model/categoryModel.js";
+import {
+  createCategory,
+  getCategories,
+  updateCategory,
+} from "../model/categoryModel.js";
 import { adminAuth } from "../middleware/authMiddleware/authMiddleware.js";
 
 import {
@@ -74,6 +78,49 @@ categoryRouter.post(
       buildErrorResponse(res, "Could not create category.");
     } catch (error) {
       buildErrorResponse(res, "Could not create category.");
+    }
+  }
+);
+
+categoryRouter.patch(
+  "/",
+  adminAuth,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      if (req.file) {
+        const uploadResult = await new Promise((resolve) => {
+          cloudinary.uploader
+            .upload_stream({ folder: "Category" }, (error, uploadResult) => {
+              if (error) {
+                return reject(error);
+              }
+
+              return resolve(uploadResult);
+            })
+            .end(req.file.buffer);
+        });
+
+        req.body.thumbnail = uploadResult?.secure_url;
+
+        const category = await updateCategory(req.body);
+
+        return category?._id
+          ? buildSuccessResponse(res, category, "Category updated successfully")
+          : buildErrorResponse(res, "Could not update category.");
+      }
+
+      // when image is not sent or updated
+      const { title, _id } = req.body;
+      const updatedCategory = { _id, title };
+
+      const category = await updateCategory(updatedCategory);
+
+      category?._id
+        ? buildSuccessResponse(res, category, "Category updated successfully")
+        : buildErrorResponse(res, "Could not update category.");
+    } catch (error) {
+      buildErrorResponse(res, "Could not update category.");
     }
   }
 );
