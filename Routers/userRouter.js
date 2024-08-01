@@ -5,6 +5,7 @@ import {
   createUser,
   findOtp,
   findUserByEmail,
+  getUsers,
   updateUser,
 } from "../Model/userModel.js";
 import { v4 as uuidv4 } from "uuid";
@@ -79,13 +80,11 @@ userRouter.post("/", newUserValidation, async (req, res) => {
 userRouter.patch("/verify-email", async (req, res) => {
   try {
     const { userEmail, token } = req.body;
-    console.log("userEmail:", userEmail);
-    console.log("token:", token);
 
     if (userEmail && token) {
       // Delete the session if it matches to avoid having too many in the database
       const result = await deleteSession({ token, userEmail });
-      console.log(result);
+
       // If token existed in the session against this user
       if (result?._id) {
         // Update the user to verified status
@@ -115,7 +114,7 @@ userRouter.patch("/verify-email", async (req, res) => {
 userRouter.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email);
+
     // Find user by email
 
     const user = await findUserByEmail(email);
@@ -163,6 +162,19 @@ userRouter.get("/", adminAuth, async (req, res) => {
   }
 });
 
+// Get users
+userRouter.get("/all", adminAuth, async (req, res) => {
+  try {
+    const users = await getUsers();
+
+    if (users?.length > 0) {
+      return buildSuccessResponse(res, users, "Got all users");
+    }
+  } catch (error) {
+    buildErrorResponse(res, error.message);
+  }
+});
+
 // GET NEW ACCESS TOKEN
 userRouter.get("/accessjwt", refreshAuth);
 
@@ -188,9 +200,9 @@ export default userRouter;
 userRouter.post("/verify-email", async (req, res) => {
   try {
     const { email } = req.body;
-    console.log(email);
+
     const user = await findUserByEmail(email);
-    console.log(user);
+
     if (!user?._id) {
       return buildErrorResponse(res, "User account does not exist!");
     }

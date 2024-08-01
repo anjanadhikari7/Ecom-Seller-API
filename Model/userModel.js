@@ -5,6 +5,11 @@ export const createUser = (userObj) => {
   return userSchema(userObj).save();
 };
 
+// Get users
+
+export const getUsers = () => {
+  return userSchema.find();
+};
 // Update User
 export const updateUser = (filter, updatedUser) => {
   return userSchema.findOneAndUpdate(filter, updatedUser, { new: true });
@@ -13,7 +18,6 @@ export const updateUser = (filter, updatedUser) => {
 // Find user by email
 
 export const findUserByEmail = (email) => {
-  console.log(email);
   return userSchema.findOne({ email });
 };
 
