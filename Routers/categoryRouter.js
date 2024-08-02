@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createCategory,
+  deleteCategory,
   getCategories,
   updateCategory,
 } from "../model/categoryModel.js";
@@ -124,4 +125,17 @@ categoryRouter.patch(
     }
   }
 );
+
+categoryRouter.delete("/", adminAuth, async (req, res) => {
+  try {
+    const { _id } = req.body;
+    const result = await deleteCategory(_id);
+    if (result?._id) {
+      buildSuccessResponse(res, {}, "Category successfully deleted");
+    }
+    buildErrorResponse(res, "Could not delete category");
+  } catch (error) {
+    buildErrorResponse(res, "Could not delete category");
+  }
+});
 export default categoryRouter;
