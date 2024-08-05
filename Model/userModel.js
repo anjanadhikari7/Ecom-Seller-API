@@ -12,7 +12,9 @@ export const getUsers = () => {
 };
 // Update User
 export const updateUser = (filter, updatedUser) => {
-  return userSchema.findOneAndUpdate(filter, updatedUser, { new: true });
+  return userSchema.findOneAndUpdate(filter, updatedUser, {
+    new: true,
+  });
 };
 
 // Find user by email

@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createProduct,
+  deleteProduct,
   getProduct,
   getProducts,
   updateproduct,
@@ -186,4 +187,17 @@ productRouter.patch(
     }
   }
 );
+productRouter.delete("/", adminAuth, async (req, res) => {
+  try {
+    const { _id } = req.body;
+
+    const result = await deleteProduct(_id);
+    if (result?._id) {
+      return buildSuccessResponse(res, {}, "Product successfully deleted");
+    }
+    buildErrorResponse(res, "Could not delete product");
+  } catch (error) {
+    buildErrorResponse(res, "Could not delete procuct");
+  }
+});
 export default productRouter;

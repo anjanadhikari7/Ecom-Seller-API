@@ -21,3 +21,7 @@ export const updateproduct = (updatedObject) => {
     new: true,
   });
 };
+// DELETE
+export const deleteProduct = (_id) => {
+  return productSchema.findByIdAndDelete(_id);
+};

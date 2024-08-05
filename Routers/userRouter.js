@@ -139,8 +139,9 @@ userRouter.post("/login", async (req, res) => {
     // Generate and send back tokens
 
     if (isPasswordMatched) {
+      console.log("aayo");
       const jwt = await generateJWTs(user.email);
-
+      console.log(req.body);
       buildSuccessResponse(res, jwt, "Logged in Successfully");
       return;
     }
@@ -277,4 +278,20 @@ userRouter.post("/reset-password", async (req, res) => {
       "Password Changed Successfully! Please login"
     );
   } catch (error) {}
+});
+
+// Update User
+userRouter.patch("/", adminAuth, async (req, res) => {
+  try {
+    const { email, ...userData } = req.body;
+
+    const updatedUser = await updateUser({ email }, userData);
+
+    if (!updatedUser?._id) {
+      return buildErrorResponse(res, "Failed to update User");
+    }
+    return buildSuccessResponse(res, updatedUser, "User updated Successfully!");
+  } catch (error) {
+    return buildErrorResponse(res, "Failed to update User");
+  }
 });
