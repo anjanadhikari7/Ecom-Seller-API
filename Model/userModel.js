@@ -26,3 +26,9 @@ export const findUserByEmail = (email) => {
 export const findOtp = (otp) => {
   return userSchema.findOne(otp);
 };
+
+//Delete User
+
+export const deleteUser = (_id) => {
+  return userSchema.findByIdAndDelete(_id);
+};

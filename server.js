@@ -19,6 +19,7 @@ connectToMongoDb();
 // Serve Images to Client
 import path from "path";
 import productRouter from "./Routers/productRouter.js";
+import orderRouter from "./Routers/orderRouter.js";
 
 const __dirname = path.resolve();
 
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, "/public")));
 app.use("/api/user", userRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/product", productRouter);
+app.use("/api/order", orderRouter);
 
 // Run the server
 app.listen(PORT, (error) => {

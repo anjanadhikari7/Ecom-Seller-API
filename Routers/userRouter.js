@@ -3,6 +3,7 @@ import { newUserValidation } from "../middleware/validationMiddleware/userValida
 import { comparePassword, hashPassword } from "../utility/bcryptHelper.js";
 import {
   createUser,
+  deleteUser,
   findOtp,
   findUserByEmail,
   getUsers,
@@ -283,9 +284,9 @@ userRouter.post("/reset-password", async (req, res) => {
 // Update User
 userRouter.patch("/", adminAuth, async (req, res) => {
   try {
-    const { email, ...userData } = req.body;
+    const { _id, ...userData } = req.body;
 
-    const updatedUser = await updateUser({ email }, userData);
+    const updatedUser = await updateUser({ _id }, userData);
 
     if (!updatedUser?._id) {
       return buildErrorResponse(res, "Failed to update User");
@@ -293,5 +294,21 @@ userRouter.patch("/", adminAuth, async (req, res) => {
     return buildSuccessResponse(res, updatedUser, "User updated Successfully!");
   } catch (error) {
     return buildErrorResponse(res, "Failed to update User");
+  }
+});
+
+// Delete User
+
+userRouter.delete("/", adminAuth, async (req, res) => {
+  try {
+    const { _id } = req.body;
+
+    const result = await deleteUser(_id);
+    if (result?._id) {
+      return buildSuccessResponse(res, {}, "User successfully deleted");
+    }
+    buildErrorResponse(res, "Could not delete User");
+  } catch (error) {
+    buildErrorResponse(res, "Could not delete User");
   }
 });
