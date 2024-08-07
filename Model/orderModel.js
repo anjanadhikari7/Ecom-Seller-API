@@ -1,8 +1,9 @@
-import orderSchema from "../Schema/orderSchema";
+import orderSchema from "../Schema/orderSchema.js";
 
 // Create an order
 export const createOrder = (orderObj) => {
-  return orderSchema(orderObj).save;
+  console.log(orderObj);
+  return orderSchema(orderObj).save();
 };
 
 // Get all orders

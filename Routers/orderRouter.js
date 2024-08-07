@@ -27,7 +27,7 @@ orderRouter.post("/", async (req, res) => {
   try {
     const order = await createOrder(req.body);
     return order?._id
-      ? buildSuccessResponse(res, order, "Order creaetd successfully")
+      ? buildSuccessResponse(res, order, "Order created successfully")
       : buildErrorResponse(res, "Could not create order.");
   } catch (error) {
     buildErrorResponse(res, "Could not create order.");

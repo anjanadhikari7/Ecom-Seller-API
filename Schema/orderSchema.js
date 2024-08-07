@@ -2,20 +2,12 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
-    orderNumber: {
-      type: Number,
+    orderId: {
+      type: String,
       unique: true,
     },
     productName: {
       type: String,
-    },
-    productId: {
-      type: String,
-      required: true,
-    },
-    userName: {
-      type: String,
-      required: true,
     },
     userId: {
       type: String,
@@ -26,11 +18,11 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     date: {
-      type: date,
+      type: Date,
       required: true,
     },
     price: {
-      type: number,
+      type: Number,
       required: true,
     },
     quantity: {
@@ -38,17 +30,12 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     totalPrice: {
-      type: number,
+      type: Number,
       required: true,
     },
     status: {
-      type: string,
-      default: "pending",
-    },
-
-    thumbnail: {
       type: String,
-      required: true,
+      default: "pending",
     },
   },
   {
