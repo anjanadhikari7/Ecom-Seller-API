@@ -28,8 +28,8 @@ orderRouter.post("/", async (req, res) => {
     const order = await createOrder(req.body);
     return order?._id
       ? buildSuccessResponse(res, order, "Order created successfully")
-      : buildErrorResponse(res, "Could not create order.");
+      : buildErrorResponse(res, error.message);
   } catch (error) {
-    buildErrorResponse(res, "Could not create order.");
+    buildErrorResponse(res, error.message);
   }
 });
