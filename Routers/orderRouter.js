@@ -1,5 +1,10 @@
 import express from "express";
-import { createOrder, getOrders } from "../Model/orderModel.js";
+import {
+  createOrder,
+  deleteOrder,
+  getOrders,
+  updateOrder,
+} from "../Model/orderModel.js";
 import { adminAuth } from "../middleware/authMiddleware/authMiddleware.js";
 import {
   buildErrorResponse,
@@ -31,5 +36,43 @@ orderRouter.post("/", async (req, res) => {
       : buildErrorResponse(res, error.message);
   } catch (error) {
     buildErrorResponse(res, error.message);
+  }
+});
+
+// Update order
+
+orderRouter.patch("/", adminAuth, async (req, res) => {
+  try {
+    const { _id, ...orderData } = req.body;
+    console.log(orderData);
+
+    const updatedOrder = await updateOrder({ _id }, orderData);
+
+    if (!updatedOrder?._id) {
+      return buildErrorResponse(res, "Failed to update Order");
+    }
+    return buildSuccessResponse(
+      res,
+      updatedOrder,
+      "Order updated Successfully!"
+    );
+  } catch (error) {
+    return buildErrorResponse(res, "Failed to update order");
+  }
+});
+
+// Delete order
+
+orderRouter.delete("/", adminAuth, async (req, res) => {
+  try {
+    const { _id } = req.body;
+
+    const result = await deleteOrder(_id);
+    if (result?._id) {
+      return buildSuccessResponse(res, {}, "Order successfully deleted");
+    }
+    buildErrorResponse(res, "Could not delete Order");
+  } catch (error) {
+    buildErrorResponse(res, "Could not delete Order");
   }
 });

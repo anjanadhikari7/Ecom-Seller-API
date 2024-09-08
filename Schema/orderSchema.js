@@ -1,18 +1,32 @@
 import mongoose from "mongoose";
 
+const productSchema = new mongoose.Schema({
+  productId: {
+    type: String,
+    required: true,
+  },
+  productName: {
+    type: String,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+});
+
 const orderSchema = new mongoose.Schema(
   {
     orderId: {
       type: String,
       unique: true,
     },
-    productId: {
-      type: String,
-
+    products: {
+      type: [productSchema], // Array of product objects
       required: true,
-    },
-    productName: {
-      type: String,
     },
     userId: {
       type: String,
@@ -24,14 +38,6 @@ const orderSchema = new mongoose.Schema(
     },
     date: {
       type: Date,
-      required: true,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
-    quantity: {
-      type: Number,
       required: true,
     },
     totalPrice: {

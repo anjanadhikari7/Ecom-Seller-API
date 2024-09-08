@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import Stripe from "stripe";
 import userRouter from "./Routers/userRouter.js";
 import categoryRouter from "./Routers/categoryRouter.js";
 
@@ -31,6 +32,26 @@ app.use("/api/category", categoryRouter);
 app.use("/api/product", productRouter);
 app.use("/api/order", orderRouter);
 
+//STRIPE Integration
+
+const stripe = new Stripe(process.env.STRIPE_API_KEY);
+app.post("/create-payment-intent", async (req, res) => {
+  try {
+    const { amount } = req.body;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "aud",
+      payment_method: "pm_card_mastercard",
+    });
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    res.json({
+      error: error.message,
+    });
+  }
+});
 // Run the server
 app.listen(PORT, (error) => {
   error
