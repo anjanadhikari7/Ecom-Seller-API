@@ -5,6 +5,9 @@
   "author": "Anjan",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "nodemon server.js",
     "seed": "node seed/seedAdminUser.js"
