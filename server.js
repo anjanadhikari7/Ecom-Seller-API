@@ -4,26 +4,33 @@ import cors from "cors";
 import Stripe from "stripe";
 import userRouter from "./Routers/userRouter.js";
 import categoryRouter from "./Routers/categoryRouter.js";
-
+import productRouter from "./Routers/productRouter.js";
+import orderRouter from "./Routers/orderRouter.js";
 import { connectToMongoDb } from "./config/dbConfig.js";
+import path from "path";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+const __dirname = path.resolve();
 
 // Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin:
+      "https://ecom-seller-client-o0mltara7-anjan-adhikaris-projects.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+app.options("*", cors()); // Explicitly handle preflight requests
 app.use(express.json());
 
 // Connect to Database
 connectToMongoDb();
 
 // Serve Images to Client
-import path from "path";
-import productRouter from "./Routers/productRouter.js";
-import orderRouter from "./Routers/orderRouter.js";
-
-const __dirname = path.resolve();
-
 app.use(express.static(path.join(__dirname, "/public")));
 
 // Routes
@@ -32,26 +39,25 @@ app.use("/api/category", categoryRouter);
 app.use("/api/product", productRouter);
 app.use("/api/order", orderRouter);
 
-//STRIPE Integration
-
+// Stripe Integration
 const stripe = new Stripe(process.env.STRIPE_API_KEY);
+
 app.post("/create-payment-intent", async (req, res) => {
   try {
     const { amount } = req.body;
+    if (!amount) {
+      return res.status(400).json({ error: "Amount is required" });
+    }
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount,
+      amount,
       currency: "aud",
-      payment_method: "pm_card_mastercard",
     });
-    res.json({
-      clientSecret: paymentIntent.client_secret,
-    });
+    res.json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
-    res.json({
-      error: error.message,
-    });
+    res.status(500).json({ error: error.message });
   }
 });
+
 // Run the server
 app.listen(PORT, (error) => {
   error
