@@ -8,13 +8,8 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "server.js"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
+      "src": "/api/(.*)",
+      "dest": "server.js",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
@@ -29,6 +24,10 @@
           "value": "Authorization, Content-Type"
         }
       ]
+    },
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
     }
   ]
 }
