@@ -16,8 +16,7 @@ const __dirname = path.resolve();
 // Middlewares
 app.use(
   cors({
-    origin:
-      "https://ecom-seller-client-o0mltara7-anjan-adhikaris-projects.vercel.app",
+    origin: "process.env.CLIENT_ROOT_URL",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
