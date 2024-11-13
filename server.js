@@ -13,13 +13,10 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 const __dirname = path.resolve();
 
-// Get the client URL from the environment variable
-const clientUrl = process.env.CLIENT_ROOT_URL;
-
 // Middlewares
 app.use(
   cors({
-    origin: clientUrl.endsWith("/") ? clientUrl : `${clientUrl}/`, // Ensure trailing slash consistency
+    origin: process.env.CLIENT_ROOT_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
