@@ -1,4 +1,4 @@
-import categorySchema from "../schema/categorySchema.js";
+import categorySchema from "../Schema/categorySchema.js";
 
 // GET ALL CATEGORIES
 export const getCategories = () => {
