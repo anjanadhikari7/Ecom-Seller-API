@@ -4,7 +4,7 @@ import {
   deleteCategory,
   getCategories,
   updateCategory,
-} from "../model/categoryModel.js";
+} from "../Model/categoryModel.js";
 import { adminAuth } from "../middleware/authMiddleware/authMiddleware.js";
 
 import {
